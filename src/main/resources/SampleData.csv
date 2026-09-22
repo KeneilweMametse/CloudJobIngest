@@ -1,0 +1,6 @@
+title,company,location,description,required_skills,salary_range,source_url
+Data Engineer,Takealot,Cape Town,Build and maintain ETL pipelines for e-commerce data,"Java, SQL, AWS, Kafka",R45000-65000,https://example.com/jobs/1
+Junior Java Developer,Discovery,Johannesburg,Support backend services for insurance platform,"Java, Spring, PostgreSQL",R25000-35000,https://example.com/jobs/2
+Cloud Engineer,,Pretoria,Manage AWS infrastructure and CI/CD pipelines,"AWS, Terraform, Docker",R50000-70000,https://example.com/jobs/3
+Data Analyst,Woolworths,Cape Town,Analyze retail sales data and build dashboards,"SQL, Python, Tableau",R30000-40000,https://example.com/jobs/4
+Data Engineer,Takealot,Cape Town,Duplicate of listing 1 to test dedup,"Java, SQL, AWS",R45000-65000,https://example.com/jobs/1
