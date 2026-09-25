@@ -1,0 +1,69 @@
+package za.co.cloudingest.service;
+
+import za.co.cloudingest.model.RawJobRecord;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ * Load step: writes cleaned job records into the RDS Postgres "jobs" table.
+ * Uses an UPSERT (ON CONFLICT) keyed on source_url so re-running the same
+ * file doesn't create duplicate rows.
+ *
+ * Connection details come from environment variables set on the Lambda:
+ *   DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
+ */
+public class RdsLoader {
+
+    private static final String UPSERT_SQL = """
+            INSERT INTO jobs (title, company, location, description, required_skills,
+                               salary_range, source_url, source, posted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'cloud-ingest', now())
+            ON CONFLICT (source_url) DO UPDATE SET
+                title = EXCLUDED.title,
+                company = EXCLUDED.company,
+                location = EXCLUDED.location,
+                description = EXCLUDED.description,
+                required_skills = EXCLUDED.required_skills,
+                salary_range = EXCLUDED.salary_range
+            """;
+
+    public int load(List<RawJobRecord> records) throws SQLException {
+        String url = "jdbc:postgresql://" + env("DB_HOST") + ":" + env("DB_PORT") + "/" + env("DB_NAME");
+
+        int written = 0;
+        try (Connection conn = DriverManager.getConnection(url, env("DB_USER"), env("DB_PASSWORD"));
+             PreparedStatement stmt = conn.prepareStatement(UPSERT_SQL)) {
+
+            for (RawJobRecord r : records) {
+                stmt.setString(1, r.getTitle());
+                stmt.setString(2, r.getCompany());
+                stmt.setString(3, r.getLocation());
+                stmt.setString(4, r.getDescription());
+                stmt.setString(5, r.getRequiredSkills());
+                stmt.setString(6, r.getSalaryRange());
+                stmt.setString(7, r.getSourceUrl());
+                stmt.addBatch();
+            }
+
+            int[] results = stmt.executeBatch();
+            for (int res : results) {
+                if (res > 0 || res == java.sql.Statement.SUCCESS_NO_INFO) {
+                    written++;
+                }
+            }
+        }
+        return written;
+    }
+
+    private String env(String key) {
+        String value = System.getenv(key);
+        if (value == null) {
+            throw new IllegalStateException("Missing required environment variable: " + key);
+        }
+        return value;
+    }
+}
