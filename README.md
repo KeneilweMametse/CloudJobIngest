@@ -85,12 +85,9 @@ CloudWatch Logs for the ingest summary.
 
 Link:
 
-## Status
+## Verification code
 
-- [x] Extract / Transform / Load logic + unit tests
-- [x] Lambda handler wired to S3 events
-- [ ] Deployed and demoed against a live RDS instance
-- [ ] Demo video recorded
+WTC-VY2B6R85
 
 ## Author
 
