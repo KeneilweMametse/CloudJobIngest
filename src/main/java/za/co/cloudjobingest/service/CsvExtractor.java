@@ -1,6 +1,6 @@
-package za.co.cloudingest.service;
+package za.co.cloudjobingest.service;
 
-import za.co.cloudingest.model.RawJobRecord;
+import za.co.cloudjobingest.model.RawJobRecord;
 
 import java.io.BufferedReader;
 import java.io.IOException;
